@@ -1,0 +1,20 @@
+.data-tile{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+}
+
+.data-tile-daily-avg{
+    display: flex;
+    width: 40%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.data-tile-change{
+    display: flex;
+    width: 20%;
+    align-items: center;
+    justify-content: space-between;
+}
