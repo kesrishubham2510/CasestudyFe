@@ -1,0 +1,19 @@
+.vaccinationdose-tile {
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    width: 300px;
+    border: 2px solid green;
+    justify-content: center;
+}
+
+
+.vaccinationdose-datastat {
+    display: flex;
+    /* flex-direction: column; */
+    border: 2px solid orange;
+    padding: 5px;
+    margin: 4px;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
