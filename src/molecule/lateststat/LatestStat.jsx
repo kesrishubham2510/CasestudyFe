@@ -1,6 +1,7 @@
 import './lateststat.css'
 
 import TextTile from '../../atom/texttile/TextTile';
+import NumberTile from '../../atom/numbertile/NumberTile';
 
 function LatestStat(props) {
 
@@ -11,7 +12,7 @@ function LatestStat(props) {
                 <TextTile text={props.text}></TextTile>
             </div>
             <div className='data-stat-number'>
-                <TextTile text={props.number}></TextTile>
+                <NumberTile number={props.number}></NumberTile>
             </div>
         </div>
     </div>
