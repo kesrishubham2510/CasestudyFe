@@ -4,6 +4,7 @@ import { useContext } from "react";
 import './welcome.css';
 import { AppContext } from "../../context/AppContext";
 import Toast from "../../molecule/toast/Toast";
+import { dataSource } from "../../connection/APIConnection";
 
 function Welcome() {
 
@@ -220,6 +221,7 @@ function Welcome() {
         'referenceDate': appContext.state.beginningDate
     };
 
+    const [infoDisplayed, setInfoDisplayed] = useState(false);
     const [countryFieldState, setcountryFieldState] = useState(countryFieldStateInitial);
 
     function captureInput(event) {
@@ -239,38 +241,80 @@ function Welcome() {
 
     }
 
-    function resetError(){
-         setcountryFieldState((prevState)=>{
-                return {
-                    ...prevState,
-                    'err': '',
-                    'countryName': ''
-                }
-            })
+    function resetError() {
+        setcountryFieldState((prevState) => {
+            return {
+                ...prevState,
+                'err': ''
+            }
+        })
     }
 
-    function validateCountryName(country){
-        if(countries.indexOf(country)==-1){
-            setcountryFieldState((prevState)=>{
-                return {
-                    ...prevState,
-                    'err': 'Invalid Country',
-                    'countryName': ''
-                }
-            })
+    function validateCountryName(country) {
+        if (countries.indexOf(country) == -1) {
+            return false;
         }
+
+        return true;
     }
 
-    function searchStats() {
+    async function searchStats() {
         const formattedDate = formatDate(countryFieldState.referenceDate);
 
         if (countryFieldState.countryName.trim() === '' || countryFieldState.countryName === '') {
             return;
         }
 
-        validateCountryName(countryFieldState.countryName);
+        const comparisionCountries = countryFieldState.countryName.split(',');
+        console.log('Comparision countries:- ',comparisionCountries);
+        var invalidCountry = false;
+      
+        comparisionCountries.forEach(country => {
 
-        console.log(countryFieldState.countryName, formattedDate)
+            if (!validateCountryName(country.trim())) {
+                setcountryFieldState((prevState) => {
+                    return {
+                        ...prevState,
+                        'err': 'Country:- '+ country.trim() + ', Invalid'
+                    }
+                });
+
+                invalidCountry = true;
+                return;
+            }
+
+        });
+
+        if(invalidCountry){
+            return;
+        }
+
+        var receivedData = null;
+
+        try {
+            if (comparisionCountries.length == 1) {
+                receivedData = await dataSource.countryStats(countryFieldState.countryName, formattedDate);
+            } else {
+
+                if (comparisionCountries.length == 2) {
+                    receivedData = await dataSource.comparisionStats(comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), '', '', formattedDate);
+                } else if (comparisionCountries.length == 3) {
+                    receivedData = await dataSource.comparisionStats(comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), '', formattedDate);
+                } else {
+                    receivedData = await dataSource.comparisionStats(comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), comparisionCountries.at(3).trim(), formattedDate);
+                }
+            }
+        } catch (error) {
+            // handling the error by showing toast message
+
+            setcountryFieldState((prevState) => {
+                console.log(prevState);
+                return {
+                    ...prevState,
+                    'err': error.message
+                }
+            })
+        }
     }
 
     function formatDate(dateString) {
@@ -281,16 +325,21 @@ function Welcome() {
         <h2>{appContext.state.dashboardTitle}</h2>
         <div className='input'>
             <form>
-                <input id='countryName' type='text' value={countryFieldState.countryName} onChange={captureInput} placeholder='Please enter your country name'></input>
+                <input id='countryName' type='text' value={countryFieldState.countryName} onChange={captureInput} placeholder='Provide comma separared country names'></input>
                 <input id='referenceDate' type='date' min={countryFieldState.referenceDate || "2020-02-05"} onChange={captureInput} value={countryFieldState.referenceDate}></input>
             </form>
         </div>
         <button className="searchButton" onClick={searchStats}>Search</button>
-       { countryFieldState.err.trim()   .length === 0 ? <div></div> : <Toast
-          message={countryFieldState.err}
-          type={'error'}
-          onClose={resetError}
-        /> }
+        {countryFieldState.err.trim().length === 0 ? <div></div> : <Toast
+            message={countryFieldState.err}
+            type={'error'}
+            onClose={resetError}
+        />}
+        {infoDisplayed ? <div></div> : <Toast
+            message={'Use Comma separated country names for comparision'}
+            type={'info'}
+            onClose={() => setInfoDisplayed(true)}
+        />}
     </section>
 }
 
