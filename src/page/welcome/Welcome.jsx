@@ -6,32 +6,56 @@ import { AppContext } from "../../context/AppContext";
 
 function Welcome() {
 
-    var countryNameInitial = '';
+
     var appContext = useContext(AppContext);
-   
-    const [countryName, setCountryName] = useState(countryNameInitial);
+
+    var countryFieldStateInitial = {
+        'countryName': '',
+        'err': '',
+        'referenceDate': appContext.state.beginningDate
+    };
+
+    const [countryFieldState, setcountryFieldState] = useState(countryFieldStateInitial);
 
     function captureInput(event) {
-        const country = event.target.value;
 
-        console.log(country)
+        event.preventDefault();
+        const inputId = event.target.id;
+        const value = event.target.value;
 
-        setCountryName(country);
+
+        setcountryFieldState((prevState) => {
+           return {
+                ...prevState,
+                [inputId]: value
+            };
+        });
+
     }
 
-    function submitForm(event) {
-        console.log(countryName);
+    function searchStats() {
+        const formattedDate = formatDate(countryFieldState.referenceDate);
+
+        if (countryFieldState.countryName.trim === '' || countryFieldState.countryName === '') {
+            return;
+        }
+
+        console.log(countryFieldState.countryName, formattedDate)
     }
 
+    function formatDate(dateString) {
+        const [year, month, day] = dateString.split("-");
+        return `${day}-${month}-${year}`;
+    }
     return <section className="search-bar">
         <h2>{appContext.state.dashboardTitle}</h2>
         <div className='input'>
-            <form onSubmit={submitForm}>
-                <input id='countryName' type='text' value={countryName} onChange={captureInput} placeholder='Please enter your country name'></input>
-                <input id='referenceDate' type='date' min={appContext.state.beginningDate || "2020-01-21"}></input>
+            <form>
+                <input id='countryName' type='text' value={countryFieldState.countryName} onChange={captureInput} placeholder='Please enter your country name'></input>
+                <input id='referenceDate' type='date' min={countryFieldState.referenceDate || "2020-02-05"} onChange={captureInput} value={countryFieldState.referenceDate}></input>
             </form>
         </div>
-        <button className="searchButton">Search</button>
+        <button className="searchButton" onClick={searchStats}>Search</button>
     </section>
 }
 

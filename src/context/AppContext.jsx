@@ -10,7 +10,7 @@ const appStateInit = {
     'country4': '',
     'offlineMode':false,
     // The date of first covid-19 case report
-    'beginningDate': '2020-01-21',
+    'beginningDate': '2020-02-05',
     'dateFormat': 'dd-MM-yyyy',
     'dashboardTitle': 'Covistat'
 }
