@@ -1,6 +1,6 @@
 import Endpoint from "./Endpoint";
 
-async function fetchCountryStats(country, referencedDate) {
+async function fetchCountryStats(apiKey, country, referencedDate) {
 
     if (!country?.trim()) {
         return;
@@ -11,11 +11,11 @@ async function fetchCountryStats(country, referencedDate) {
         .replace('{referencedDate}', referencedDate);
 
     try {
-
+       
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'API-KEY': '3f5c6d0e-9f48-4d5c-ae78-2db63e2f8c41'
+                'API-KEY': apiKey
             }
         });
 
@@ -39,7 +39,7 @@ async function fetchCountryStats(country, referencedDate) {
     }
 }
 
-async function fetchCountryComparisionStats(country1, country2, country3, country4, referencedDate) {
+async function fetchCountryComparisionStats(apiKey, country1, country2, country3, country4, referencedDate) {
 
     let nonEmptyCountries = 0;
     let url = Endpoint.getComparision;
@@ -77,7 +77,7 @@ async function fetchCountryComparisionStats(country1, country2, country3, countr
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'API-KEY': '3f5c6d0e-9f48-4d5c-ae78-2db63e2f8c41'
+                'API-KEY': apiKey
             }
         });
 

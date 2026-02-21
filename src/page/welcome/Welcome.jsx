@@ -293,15 +293,15 @@ function Welcome() {
 
         try {
             if (comparisionCountries.length == 1) {
-                receivedData = await dataSource.countryStats(countryFieldState.countryName, formattedDate);
+                receivedData = await dataSource.countryStats(process.env.REACT_APP_API_KEY, countryFieldState.countryName, formattedDate);
             } else {
 
                 if (comparisionCountries.length == 2) {
-                    receivedData = await dataSource.comparisionStats(comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), '', '', formattedDate);
+                    receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), '', '', formattedDate);
                 } else if (comparisionCountries.length == 3) {
-                    receivedData = await dataSource.comparisionStats(comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), '', formattedDate);
+                    receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), '', formattedDate);
                 } else {
-                    receivedData = await dataSource.comparisionStats(comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), comparisionCountries.at(3).trim(), formattedDate);
+                    receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), comparisionCountries.at(3).trim(), formattedDate);
                 }
             }
         } catch (error) {
