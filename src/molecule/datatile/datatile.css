@@ -2,19 +2,41 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 50px;
+  height: 25px;
+  font-weight: bold;
 }
 
-.data-tile-daily-avg{
+.data-tile > div{
+   margin-right: 2px;
+}
+
+.days-info {
+  display: flex;
+  width: 12%;
+  border-radius: 30px;
+  background: blanchedalmond;
+  font-size: 10px;
+  padding: 5px;
+  justify-content: center;
+}
+
+
+.dailyavg{
+   width: 30%;
+   font-size: 12px;
+   padding: 4px;
+}
+
+.changerate{
+    width: 25%;
+    font-size: 12px;
     display: flex;
+    justify-content: center;
+}
+
+.alert-message{
     width: 40%;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.data-tile-change{
+    font-weight: 12px;
     display: flex;
-    width: 20%;
-    align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 }

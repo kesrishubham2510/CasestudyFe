@@ -1,20 +1,29 @@
-import NumberTile from '../../atom/numbertile/NumberTile';
-import TextTile from '../../atom/texttile/TextTile';
 import './datatile.css';
 
-function DataTile(props){
+function DataTile(props) {
 
-    return <div className='data-tile'>
-        <div className='data-tile-daily-avg'>
-            Daily Avg. <NumberTile number={props.dailyAverage}></NumberTile>
+    function getSymbol(direction) {
+        if (direction === 'DOWN') {
+            return '⬇';
+        } else if (direction === 'UP') {
+            return '⬆';
+        }
+    }
+
+    return <section className='data-tile'>
+        <div className='dailyavg'>
+            Avg:- {Number(props.dailyAverage).toLocaleString('en-US')} 
         </div>
-        <div className='data-tile-change'>
-            <TextTile text={props.direction}></TextTile> {props.change}  
+        <div className='days-info'>
+            {props.days} Days
         </div>
-        <div>
-            <TextTile text={props.message}/>
+        <div className='changerate'>
+            {getSymbol(props.direction)} {props.change}
         </div>
-    </div>
+        <div className='alert-message'>
+            <h5>{props.message}</h5>
+        </div>
+    </section>
 }
 
 export default DataTile;
