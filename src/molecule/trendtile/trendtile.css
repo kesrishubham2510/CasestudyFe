@@ -1,6 +1,28 @@
 .trends-data{
     display: flex;
     flex-direction: column;
-    border: 2px solid orange;
-    width: 600px;
+    width: 100%;
+    padding: 12px;
+    gap: 12px;             
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.trends-data > h3{
+    padding: 10px 12px;
+    background: linear-gradient(135deg,#4f8df5,#2563eb);
+    color: white;
+    border-radius: 10px;
+    font-size: 16px;
+    margin: 0px
+}
+
+.trendsdata-card{
+    padding: 12px;
+    background: #f3f7ff;
+    border-radius: 12px;
+    align-items: center;
+    font-weight: 500;
+    box-shadow: inset 0 0 0 1px #e3e9f7;
 }
