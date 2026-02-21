@@ -5,9 +5,9 @@ import NumberTile from '../../atom/numbertile/NumberTile';
 
 function LatestStat(props) {
 
-    return <div className='stat-tile'>
+    return <div className={`stat-tile ${props.background}`}>
         <img className='stat-img' src={props.image}></img>
-        <div className='data-stat'>
+        <div className='data-stat-card'>
             <div className='data-stat-text'>
                 <TextTile text={props.text}></TextTile>
             </div>
