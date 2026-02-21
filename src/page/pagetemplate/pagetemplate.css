@@ -1,0 +1,11 @@
+.page-template {
+ width: 70%;
+    display: flex;
+    margin: auto;
+    min-height: 100vh;
+    border-radius: 20px;
+    padding: 20px;
+    background: #eef3fb;
+    justify-content: center;  /* horizontal */
+    align-items: center;   
+}
