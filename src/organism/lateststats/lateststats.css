@@ -1,0 +1,17 @@
+.lateststats{
+   display: flex;
+    /* align-self: center; */
+    padding: 5px;
+    /* width: 100%; */
+    justify-content: space-between;
+    padding: 10px;
+    /* border: 2px solid forestgreen; */
+    background: white;
+    border-radius: 10px;
+    flex-direction: column;
+}
+
+.stat-cards{
+    display: flex;
+    justify-content: space-around;
+}
