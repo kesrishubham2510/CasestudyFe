@@ -83,7 +83,7 @@ async function fetchCountryComparisionStats(apiKey, country1, country2, country3
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Comparison data:- ', data);
+         
             return data;
         }
 

@@ -17,7 +17,6 @@ function PageTemplate(props) {
 
     function toggleOfflineMode() {
 
-        console.log(appContext.state);
 
         if (appContext.state.offlineMode === false) {
             console.log('Enabling offline mode');

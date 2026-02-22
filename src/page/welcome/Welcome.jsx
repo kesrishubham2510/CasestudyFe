@@ -260,7 +260,7 @@ function Welcome() {
     }
 
     function validateCountryName(country) {
-        if (countries.indexOf(country) == -1) {
+        if (countries.indexOf(country) === -1) {
             return false;
         }
 
@@ -301,14 +301,14 @@ function Welcome() {
         var receivedData = null;
 
         try {
-            if (comparisionCountries.length == 1) {
+            if (comparisionCountries.length === 1) {
                 receivedData = await dataSource.countryStats(process.env.REACT_APP_API_KEY, countryFieldState.countryName, formattedDate);
                 navigate('/stats', { state: receivedData });
             } else {
 
-                if (comparisionCountries.length == 2) {
+                if (comparisionCountries.length === 2) {
                     receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), '', '', formattedDate);
-                } else if (comparisionCountries.length == 3) {
+                } else if (comparisionCountries.length === 3) {
                     receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), '', formattedDate);
                 } else {
                     receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), comparisionCountries.at(3).trim(), formattedDate);
@@ -323,7 +323,6 @@ function Welcome() {
             }
 
             setcountryFieldState((prevState) => {
-                console.log(prevState);
                 return {
                     ...prevState,
                     'err': error.message

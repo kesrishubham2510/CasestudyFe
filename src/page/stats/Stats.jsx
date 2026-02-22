@@ -20,10 +20,10 @@ function Stats() {
     }, []);
 
     return <div className='stats'>
-        <h1>Covid-19 update for {appContext.state.currCountry}</h1>
-        <LatestStats></LatestStats>
-        <VaccinationData></VaccinationData>
-        <Trends></Trends>
+        <h1>Covid-19 update for {receivedData.country}</h1>
+        <LatestStats totalCases={receivedData.noOfCases || 0} recovered={receivedData.noOfRecoveries ||  0}  activeToday={receivedData.activeAsToday || 0}/>
+        <VaccinationData country={receivedData.country} dosesAdministeredInCountry={receivedData.dosesAdministeredInCountry || 0} dosesAdministeredGlobally={receivedData.dosesAdministeredGlobally || 0} ></VaccinationData>
+        <Trends country={receivedData.country} trendsData={receivedData.trends}></Trends>
     </div>
 
 }

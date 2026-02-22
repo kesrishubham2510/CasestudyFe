@@ -12,13 +12,13 @@ function DataTile(props) {
 
     return <section className='data-tile'>
         <div className='dailyavg'>
-            Avg:- {Number(props.dailyAverage).toLocaleString('en-US')} 
+            Avg:- {Math.floor(Number(props.dailyAverage)).toLocaleString('en-US')} 
         </div>
         <div className='days-info'>
             {props.days} Days
         </div>
         <div className='changerate'>
-            {getSymbol(props.direction)} {props.change}
+            {getSymbol(props.direction)} {props.change.toFixed(2)}
         </div>
         <div className='alert-message'>
             <h5>{props.message}</h5>

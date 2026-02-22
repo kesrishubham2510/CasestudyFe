@@ -18,15 +18,18 @@ function Comparision() {
         }
     }, []);
 
-    return <section className="comparision-page">
-        <h3 >Covid-19 Stats Comparision</h3>
-        <div className='comparisionGrid'>
-            <ComparisionCard />
-            <ComparisionCard />
-            <ComparisionCard />
-            <ComparisionCard />
-        </div>
 
+    return <section className="comparision-page">
+        <h3 >Covid-19 Stats Comparision {receivedData.referencedDate || ` || ${appContext.state.beginningDate}`}</h3>
+        <div className='comparisionGrid'>
+
+        {
+            receivedData.map(countryStat => {
+                return <ComparisionCard key={countryStat.country} country={countryStat.country || "Abcd"} totalCases={countryStat.noOfCases || 0} recovered={countryStat.noOfRecoveries || 0} activeToday={countryStat.activeAsToday || 0} dosesAdministered={countryStat.dosesAdministeredInCountry || 0}/>
+                
+            })
+        }
+        </div>
     </section>
 }
 
