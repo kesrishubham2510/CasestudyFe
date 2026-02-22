@@ -8,11 +8,12 @@ const appStateInit = {
     'country2': '',
     'country3': '',
     'country4': '',
-    'offlineMode':false,
-    // The date of first covid-19 case report
+    // The date of first covid-19 case report'
+    'toggleButtonText':'Enable Offline Mode',
     'beginningDate': '2020-02-05',
     'dateFormat': 'dd-MM-yyyy',
-    'dashboardTitle': 'Covistat'
+    'dashboardTitle': 'Covistat',
+    'offlineMode': false
 }
 
 
@@ -20,9 +21,9 @@ const AppContext = createContext();
 
 const AppContextProvider = ({children}) => {
     
-    const [state, setstate]  = useState(appStateInit);
+    const [state, setState]  = useState(appStateInit);
 
-    return <AppContext.Provider value={{state, setstate}}>
+    return <AppContext.Provider value={{state, setState}}>
         {children}
     </AppContext.Provider>
 }
