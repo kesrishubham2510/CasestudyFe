@@ -1,9 +1,9 @@
 import './stats.css';
-import VaccinationData from '../organism/vaccinationdata/VaccinationData'
-import LatestStats from '../organism/lateststats/LatestStats';
-import Trends from '../organism/trends/Trends';
+import VaccinationData from '../../organism/vaccinationdata/VaccinationData'
+import LatestStats from '../../organism/lateststats/LatestStats';
+import Trends from '../../organism/trends/Trends';
 import { useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { AppContext } from '../../context/AppContext';
 
 function Stats() {
 
