@@ -1,0 +1,16 @@
+.comparision-page {
+    width: 80%;
+}
+
+.comparisionGrid{
+    margin: 40px auto;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.comparision-page > h3{
+    justify-content: center;
+    display: flex;
+}
