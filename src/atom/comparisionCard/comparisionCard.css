@@ -1,0 +1,26 @@
+.comparisionCard{
+    padding: 20px;
+    background: #FFFFFF;
+    border-radius: 20px;
+}
+
+.comparision-stats{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+    height: fit-content;
+    /* border: 2px solid green; */
+}
+
+.txt-heading{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+.txt-value{
+    font-size: 12px;
+    font-weight: bold;
+
+}
