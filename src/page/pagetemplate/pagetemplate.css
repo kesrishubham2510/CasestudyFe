@@ -1,6 +1,23 @@
-.page-template {
- width: 70%;
+.page-template{
+    width: 70%;
+    margin: auto;
     display: flex;
+    flex-direction: column;
+}
+
+.page-header{
+    display: flex;
+    padding: 20px;
+    margin: auto;
+    width: 100%;
+    justify-content: space-between;
+}
+
+
+.page-content {
+    width: 100%;
+    display: flex;
+    /* flex-direction: column; */
     margin: auto;
     min-height: 100vh;
     border-radius: 20px;
@@ -8,4 +25,13 @@
     background: #eef3fb;
     justify-content: center;  /* horizontal */
     align-items: center;   
+}
+
+.header-button{
+    background-color: whitesmoke;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    border: none
 }
