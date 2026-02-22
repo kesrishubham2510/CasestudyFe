@@ -1,24 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AppContextProvider from "./context/AppContext";
+
+import PageTemplate from "./page/pagetemplate/PageTemplate";
+import Stats from "./page/stats/Stats";
+import Welcome from "./page/welcome/Welcome";
+import Comparision from "./page/comparision/Comparision";
+import NotFound from "./page/notfound/NotFound";
 
 function App() {
+  const thisContent = <Comparision />;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContextProvider>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={<PageTemplate component={<Welcome />}></PageTemplate>}
+          />
+          <Route
+            path="/stats"
+            element={<PageTemplate component={<Stats />}></PageTemplate>}
+          />
+          <Route
+            path="/comparision"
+            element={<PageTemplate component={<Comparision />}></PageTemplate>}
+          />
+          <Route path="*" element={<NotFound/>}/>
+        </Routes>
+      </Router>
+    </AppContextProvider>
   );
 }
 
