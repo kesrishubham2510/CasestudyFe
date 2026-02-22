@@ -7,9 +7,9 @@ import Stats from "./page/stats/Stats";
 import Welcome from "./page/welcome/Welcome";
 import Comparision from "./page/comparision/Comparision";
 import NotFound from "./page/notfound/NotFound";
+import CovidInfo from "./page/static/CovidInfo";
 
 function App() {
-  const thisContent = <Comparision />;
 
   return (
     <AppContextProvider>
@@ -27,7 +27,11 @@ function App() {
             path="/comparision"
             element={<PageTemplate component={<Comparision />}></PageTemplate>}
           />
-          <Route path="*" element={<NotFound/>}/>
+          <Route
+            path="/covid-info"
+            element={<PageTemplate component={<CovidInfo />}></PageTemplate>}
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AppContextProvider>
