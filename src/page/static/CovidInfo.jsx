@@ -41,8 +41,7 @@ function CovidInfo(){
   const location = useLocation();
 
   useEffect(()=>{
-      console.log(location.state);
-      if(location.state.loadedDueToError){
+      if(location.state!=null && location.state.loadedDueToError!=null && location.state.loadedDueToError){
         setLoadedDueToError(true);
       }
   }, []);
