@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useContext } from "react";
 
 import './welcome.css';
 import { AppContext } from "../../context/AppContext";
 import Toast from "../../molecule/toast/Toast";
 import { dataSource } from "../../connection/APIConnection";
+import { useNavigate } from "react-router-dom";
 
 function Welcome() {
 
 
     var appContext = useContext(AppContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (appContext.state.offlineMode === true) {
+            navigate('/covid-info');
+        }
+    }, []);
+
 
     const countries = [
         "Afghanistan",
@@ -266,16 +275,16 @@ function Welcome() {
         }
 
         const comparisionCountries = countryFieldState.countryName.split(',');
-        console.log('Comparision countries:- ',comparisionCountries);
+        console.log('Comparision countries:- ', comparisionCountries);
         var invalidCountry = false;
-      
+
         comparisionCountries.forEach(country => {
 
             if (!validateCountryName(country.trim())) {
                 setcountryFieldState((prevState) => {
                     return {
                         ...prevState,
-                        'err': 'Country:- '+ country.trim() + ', Invalid'
+                        'err': 'Country:- ' + country.trim() + ', Invalid'
                     }
                 });
 
@@ -285,7 +294,7 @@ function Welcome() {
 
         });
 
-        if(invalidCountry){
+        if (invalidCountry) {
             return;
         }
 
@@ -294,6 +303,7 @@ function Welcome() {
         try {
             if (comparisionCountries.length == 1) {
                 receivedData = await dataSource.countryStats(process.env.REACT_APP_API_KEY, countryFieldState.countryName, formattedDate);
+                navigate('/stats', { state: receivedData });
             } else {
 
                 if (comparisionCountries.length == 2) {
@@ -303,9 +313,14 @@ function Welcome() {
                 } else {
                     receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), comparisionCountries.at(3).trim(), formattedDate);
                 }
+                navigate('/comparision', { state: receivedData });
             }
         } catch (error) {
-            // handling the error by showing toast message
+
+            if (error.message === 'Failed to fetch') {
+                console.log('Will display static page about Covid-19');
+                navigate('/covid-info', {state: {loadedDueToError: true}});
+            }
 
             setcountryFieldState((prevState) => {
                 console.log(prevState);
