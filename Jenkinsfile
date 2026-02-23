@@ -8,6 +8,8 @@ pipeline {
 
     environment {
         REACT_APP_API_KEY = credentials('covistat_api_key')
+        DOCKER_IMAGE = "covistat-fe"
+        BUILD_NUMBER = "0.0.1"
     }
 
     stages {
@@ -20,6 +22,12 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'CI=false npm run build'
+            }
+        }
+        
+        stage('Containerize') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .'
             }
         }
     }
