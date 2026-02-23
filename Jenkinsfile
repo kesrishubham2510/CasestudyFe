@@ -1,26 +1,22 @@
 pipeline {
     
-    agent {
-        docker {
-            image 'node:18-alpine'
-        }
-    }
+    agent any
 
     environment {
         REACT_APP_API_KEY = credentials('covistat_api_key')
         DOCKER_IMAGE = "covistat-fe"
-        BUILD_NUMBER = "0.0.1"
     }
 
     stages {
-        stage('Install') {
+        stage('React App Build') {
+             agent {
+                docker {
+                    image 'node:18-alpine'
+                }
+              }
+
             steps {
                 sh 'npm install'
-            }
-        }
-
-        stage('Build') {
-            steps {
                 sh 'CI=false npm run build'
             }
         }
