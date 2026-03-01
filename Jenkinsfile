@@ -20,6 +20,7 @@ pipeline {
             steps {
                 sh 'npm install'
                 sh 'npm run test'
+                sh 'apk add openjdk17-jre'
                 sh 'npx sonar-scanner -Dsonar.login=$SONAR_TOKEN -Dsonar.host.url=$SONAR_SEVER'
                 sh 'CI=false npm run build'
             }
