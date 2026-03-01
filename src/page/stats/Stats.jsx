@@ -14,7 +14,7 @@ function Stats() {
     const receivedData = location.state;
 
     useEffect(() => {
-        if (appContext.state.offlineMode === true) {
+        if (appContext.state!=null && appContext.state.offlineMode!=null && appContext.state.offlineMode === true) {
             navigate('/covid-info');
         }
     }, []);
