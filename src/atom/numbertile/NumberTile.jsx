@@ -9,6 +9,8 @@ function NumberTile(props){
             parsedNumber = parsedNumber.toLocaleString('en-Us');
             return parsedNumber;
         }
+
+        return Number("0");
     } 
 
     return <TextTile text={formatNumber(props.number)}></TextTile>
