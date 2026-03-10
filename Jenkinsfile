@@ -30,7 +30,7 @@ pipeline {
         
         stage('Containerize') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:0.0.1 .'
+                sh 'docker compose build'
             }
         }
     }
