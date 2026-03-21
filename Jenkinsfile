@@ -31,7 +31,7 @@ pipeline {
             steps {
                 sh 'ls -al'
                 sh 'pwd'
-                sh 'docker build -t $DOCKER_IMAGE:0.0.1 .'
+                sh 'docker build --build-arg REACT_APP_API_KEY=${REACT_APP_API_KEY} -t $DOCKER_IMAGE:0.0.1 .'
             }
         }
     }
