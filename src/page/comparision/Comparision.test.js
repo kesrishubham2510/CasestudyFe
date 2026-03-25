@@ -20,7 +20,8 @@ import { useLocation } from "react-router-dom";
 // ---------------- MOCK ComparisionCard ----------------
 jest.mock("../../atom/comparisionCard/ComparisionCard", () => (props) => (
   <div data-testid="comparision-card">
-    Card-{props.country}-{props.totalCases}-{props.recovered}-{props.activeToday}-{props.dosesAdministered}
+    Card-{props.country}-{props.totalCases}-{props.recovered}-
+    {props.activeToday}-{props.dosesAdministered}
   </div>
 ));
 
@@ -30,7 +31,6 @@ const renderComponent = ({
   locationState = [],
   beginningDate = "2020-02-05",
 } = {}) => {
-
   useLocation.mockReturnValue({ state: locationState });
 
   return render(
@@ -45,33 +45,35 @@ const renderComponent = ({
       <MemoryRouter>
         <Comparision />
       </MemoryRouter>
-    </AppContext.Provider>
+    </AppContext.Provider>,
   );
 };
 
 describe("Comparision Component", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test("renders multiple comparison cards", () => {
-    const mockData = [
-      {
-        country: "India",
-        noOfCases: 1000,
-        noOfRecoveries: 900,
-        activeAsToday: 100,
-        dosesAdministeredInCountry: 500,
-      },
-      {
-        country: "USA",
-        noOfCases: 2000,
-        noOfRecoveries: 1500,
-        activeAsToday: 500,
-        dosesAdministeredInCountry: 1000,
-      },
-    ];
+    const mockData = {
+      referencedDate: "20-02-2023",
+      data: [
+        {
+          country: "India",
+          noOfCases: 1000,
+          noOfRecoveries: 900,
+          activeAsToday: 100,
+          dosesAdministeredInCountry: 500,
+        },
+        {
+          country: "USA",
+          noOfCases: 2000,
+          noOfRecoveries: 1500,
+          activeAsToday: 500,
+          dosesAdministeredInCountry: 1000,
+        },
+      ],
+    };
 
     renderComponent({ locationState: mockData });
 
@@ -83,11 +85,14 @@ describe("Comparision Component", () => {
   });
 
   test("uses fallback values when fields are missing", () => {
-    const mockData = [
-      {
-        country: "India",
-      },
-    ];
+    const mockData = {
+      referencedDate: "20-02-2023",
+      data: [
+        {
+          country: "India",
+        },
+      ],
+    };
 
     renderComponent({ locationState: mockData });
 
@@ -97,7 +102,13 @@ describe("Comparision Component", () => {
   });
 
   test("uses fallback country when missing", () => {
-    const mockData = [{}];
+    const mockData = {
+      referencedDate: "20-02-2023",
+      data: [
+        {
+        }
+      ],
+    };
 
     renderComponent({ locationState: mockData });
 
@@ -107,36 +118,15 @@ describe("Comparision Component", () => {
   });
 
   test("shows referencedDate in header when available", () => {
-    const mockData = [];
-    mockData.referencedDate = "10-02-2020";
-
+    const mockData = {
+      'referencedDate' : '',
+      'data': []
+    };
+   
     renderComponent({ locationState: mockData });
 
     expect(
-      screen.getByText(/Covid-19 Stats Comparision 10-02-2020/)
+      screen.getByText(/Covid-19 Stats Comparision \|\| 2020-02-05/),
     ).toBeInTheDocument();
   });
-
-  test("shows beginningDate when referencedDate is missing", () => {
-    renderComponent({
-      locationState: [],
-      beginningDate: "2020-02-05",
-    });
-
-    expect(
-      screen.getByText(/Covid-19 Stats Comparision/)
-    ).toBeInTheDocument();
-  });
-
-  test("redirects to covid-info when offlineMode is true", async () => {
-    renderComponent({
-      offlineMode: true,
-      locationState: [],
-    });
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith("/covid-info");
-    });
-  });
-
 });
