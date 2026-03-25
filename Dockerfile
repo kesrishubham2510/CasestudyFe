@@ -1,6 +1,10 @@
 # Step 1: Build the app in a Node environment
 FROM node:18-alpine AS build-stage
 WORKDIR /app
+
+ARG REACT_APP_API_KEY
+ENV REACT_APP_API_KEY=$REACT_APP_API_KEY
+
 COPY package*.json ./
 RUN npm install
 COPY . .
