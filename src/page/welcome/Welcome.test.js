@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import Welcome from "./Welcome";
 import { AppContext } from "../../context/AppContext";
 import { dataSource } from "../../connection/APIConnection";
+import errors from "../../error/Errors";
 
 // Mock navigate
 const mockNavigate = jest.fn();
@@ -41,12 +42,11 @@ const renderComponent = (offlineMode = false) => {
       <MemoryRouter>
         <Welcome />
       </MemoryRouter>
-    </AppContext.Provider>
+    </AppContext.Provider>,
   );
 };
 
 describe("Welcome Component", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -54,7 +54,9 @@ describe("Welcome Component", () => {
   test("renders correctly", () => {
     renderComponent();
     expect(screen.getByText("COVID Dashboard")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Provide comma separared/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Provide comma separared/i),
+    ).toBeInTheDocument();
   });
 
   test("redirects to covid-info when offlineMode is true", async () => {
@@ -78,7 +80,9 @@ describe("Welcome Component", () => {
     renderComponent();
 
     const input = screen.getByPlaceholderText(/Provide comma separared/i);
-    fireEvent.change(input, { target: { id: "countryName", value: "InvalidCountry" } });
+    fireEvent.change(input, {
+      target: { id: "countryName", value: "InvalidCountry" },
+    });
 
     fireEvent.click(screen.getByText("Search"));
 
@@ -112,7 +116,7 @@ describe("Welcome Component", () => {
     renderComponent();
 
     fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
-      target: { id: "countryName", value: "India,USA" },
+      target: { id: "countryName", value: "India, USA" },
     });
 
     fireEvent.click(screen.getByText("Search"));
@@ -120,7 +124,10 @@ describe("Welcome Component", () => {
     await waitFor(() => {
       expect(dataSource.comparisionStats).toHaveBeenCalled();
       expect(mockNavigate).toHaveBeenCalledWith("/comparision", {
-        state: { compare: "data" },
+        state: {
+          referencedDate: expect.any(String),
+          data: { compare: "data" },
+        },
       });
     });
   });
@@ -158,7 +165,9 @@ describe("Welcome Component", () => {
   });
 
   test("redirects to covid-info on fetch failure", async () => {
-    dataSource.countryStats.mockRejectedValue(new Error("Failed to fetch"));
+    dataSource.countryStats.mockRejectedValue(
+      new errors.networkError("Failed to fetch"),
+    );
 
     renderComponent();
 

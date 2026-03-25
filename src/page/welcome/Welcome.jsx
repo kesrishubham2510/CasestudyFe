@@ -6,6 +6,7 @@ import { AppContext } from "../../context/AppContext";
 import Toast from "../../molecule/toast/Toast";
 import { dataSource } from "../../connection/APIConnection";
 import { useNavigate } from "react-router-dom";
+import errors from "../../error/Errors";
 
 function Welcome() {
 
@@ -274,7 +275,7 @@ function Welcome() {
             return;
         }
 
-        const comparisionCountries = countryFieldState.countryName.split(',');
+        const comparisionCountries = countryFieldState.countryName.split(',').map(country => country?.trim()).filter(country => country?.length!=0);
         console.log('Comparision countries:- ', comparisionCountries);
         var invalidCountry = false;
 
@@ -305,19 +306,16 @@ function Welcome() {
                 receivedData = await dataSource.countryStats(process.env.REACT_APP_API_KEY, countryFieldState.countryName, formattedDate);
                 navigate('/stats', { state: receivedData });
             } else {
-
-                if (comparisionCountries.length === 2) {
-                    receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), '', '', formattedDate);
-                } else if (comparisionCountries.length === 3) {
-                    receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), '', formattedDate);
-                } else {
-                    receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries.at(0).trim(), comparisionCountries.at(1).trim(), comparisionCountries.at(2).trim(), comparisionCountries.at(3).trim(), formattedDate);
-                }
-                navigate('/comparision', { state: receivedData });
+                receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries, formattedDate);
+                let data = {
+                'referencedDate': formattedDate,
+                'data': receivedData
+              }
+                navigate('/comparision', { state: data });
             }
         } catch (error) {
 
-            if (error.message === 'Failed to fetch') {
+            if(error instanceof errors.networkError){
                 console.log('Will display static page about Covid-19');
                 navigate('/covid-info', {state: {loadedDueToError: true}});
             }
