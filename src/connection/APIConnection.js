@@ -1,4 +1,5 @@
 import Endpoint from "./Endpoint";
+import errors from "../error/Errors.js";
 
 async function fetchCountryStats(apiKey, country, referencedDate) {
 
@@ -26,52 +27,42 @@ async function fetchCountryStats(apiKey, country, referencedDate) {
 
         if (response.status >= 400 && response.status < 500) {
             const error = await response.text();
-            throw new Error(`Client Error (${response.status}): ${error}`);
+            throw new errors.clientError(error, response.status);
         }
 
         if (response.status >= 500) {
-            throw new Error(`Server Error (${response.status}). Please try again later.`);
+            throw new errors.serverError('Server Error. Please try again later.', response.status);
         }
 
     } catch (error) {
+
+        if (error instanceof TypeError) {
+          console.error("Connectivity Issue | Error fetching country stats:", error.message);
+          throw new errors.networkError("Network error. Please check your internet connection.");
+        }
+
         console.error("Error fetching country stats:", error.message);
         throw error;   // rethrow so UI can handle
     }
 }
 
-async function fetchCountryComparisionStats(apiKey, country1, country2, country3, country4, referencedDate) {
+async function fetchCountryComparisionStats(apiKey, countries, referencedDate) {
 
-    let nonEmptyCountries = 0;
     let url = Endpoint.getComparision;
 
-    if (country1?.trim()) {
-        nonEmptyCountries++;
-        url = url.replace('{country1}', country1);
+    const searchParams = new URLSearchParams();
+
+    countries.forEach((country, index)=> {
+        searchParams.append(`country${index+1}`, country);
+    });
+
+    if(referencedDate){
+        searchParams.append('referencedDate',referencedDate);
     }
 
-    if (country2?.trim()) {
-        nonEmptyCountries++;
-        url = url.replace('{country2}', country2);
-    }
-
-    if (country3?.trim()) {
-        nonEmptyCountries++;
-        url = url.replace('{country3}', country3);
-    } else {
-        url = url.replace('&country3={country3}', '');
-    }
-
-    if (country4?.trim()) {
-        nonEmptyCountries++;
-        url = url.replace('{country4}', country4);
-    } else {
-        url = url.replace('&country4={country4}', '');
-    }
-
-    if (nonEmptyCountries < 2) {
-        throw new Error("At least 2 countries are required for comparison.");
-    }
-
+    
+    url = url.concat('?', searchParams.toString());
+    
     try {
 
         const response = await fetch(url, {
@@ -89,14 +80,20 @@ async function fetchCountryComparisionStats(apiKey, country1, country2, country3
 
         if (response.status >= 400 && response.status < 500) {
             const error = await response.text();
-            throw new Error(`Client Error (${response.status}): ${error}`);
+            throw new errors.clientError(error, response.status);
         }
 
         if (response.status >= 500) {
-            throw new Error(`Server Error (${response.status}). Please try again later.`);
+            throw new errors.serverError('Server Error. Please try again later.', response.status);
         }
 
+
     } catch (error) {
+
+        if (error instanceof TypeError) {
+          console.error("Connectivity Issue | Error fetching comparision stats:", error.message);
+          throw new errors.networkError("Network error. Please check your internet connection.");
+        }
         console.error("Error fetching comparison stats:", error.message);
         throw error;
     }

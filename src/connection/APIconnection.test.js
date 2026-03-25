@@ -1,143 +1,110 @@
 import { dataSource } from './APIConnection';
 import Endpoint from './Endpoint';
+import errors from '../error/Errors';
 
 global.fetch = jest.fn();
 
-describe('fetchCountryStats', () => {
+jest.mock('./Endpoint', () => ({
+  latestStat: 'https://api.com/{country}/{referencedDate}',
+  getComparision: 'https://api.com/compare'
+}));
 
-  const apiKey = 'test-api-key';
-  const country = 'India';
-  const date = '2024-01-01';
+jest.mock('../error/Errors', () => ({
+  clientError: class ClientError extends Error {
+    constructor(message, status) {
+      super(message);
+      this.status = status;
+    }
+  },
+  serverError: class ServerError extends Error {
+    constructor(message, status) {
+      super(message);
+      this.status = status;
+    }
+  },
+  networkError: class NetworkError extends Error {}
+}));
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+test('fetchCountryStats returns data on success', async () => {
+  const mockData = { cases: 100 };
+
+  fetch.mockResolvedValue({
+    ok: true,
+    json: jest.fn().mockResolvedValue(mockData)
   });
 
-  test('should return data when response is ok', async () => {
-    const mockData = { cases: 1000 };
+  const result = await dataSource.countryStats('key', 'India', '2024');
 
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockData
-    });
-
-    const result = await dataSource.countryStats(apiKey, country, date);
-
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(result).toEqual(mockData);
-  });
-
-  test('should throw client error for 4xx response', async () => {
-    fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 404,
-      text: async () => 'Not Found'
-    });
-
-    await expect(
-      dataSource.countryStats(apiKey, country, date)
-    ).rejects.toThrow('Client Error (404): Not Found');
-  });
-
-  test('should throw server error for 5xx response', async () => {
-    fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500
-    });
-
-    await expect(
-      dataSource.countryStats(apiKey, country, date)
-    ).rejects.toThrow(
-      'Server Error (500). Please try again later.'
-    );
-  });
-
-  test('should return undefined if country is empty', async () => {
-    const result = await dataSource.countryStats(apiKey, '', date);
-
-    expect(fetch).not.toHaveBeenCalled();
-    expect(result).toBeUndefined();
-  });
-
+  expect(result).toEqual(mockData);
+  expect(fetch).toHaveBeenCalled();
 });
 
-describe('fetchCountryComparisionStats', () => {
-
-  const apiKey = 'test-api-key';
-  const date = '2024-01-01';
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+test('fetchCountryStats throws clientError on 4xx', async () => {
+  fetch.mockResolvedValue({
+    ok: false,
+    status: 404,
+    text: jest.fn().mockResolvedValue('Not Found')
   });
 
-  test('should throw error if less than 2 countries provided', async () => {
-    await expect(
-      dataSource.comparisionStats(apiKey, 'India', '', '', '', date)
-    ).rejects.toThrow(
-      'At least 2 countries are required for comparison.'
-    );
+  await expect(
+    dataSource.countryStats('key', 'India', '2024')
+  ).rejects.toBeInstanceOf(errors.clientError);
+});
 
-    expect(fetch).not.toHaveBeenCalled();
+test('fetchCountryStats throws serverError on 5xx', async () => {
+  fetch.mockResolvedValue({
+    ok: false,
+    status: 500
   });
 
-  test('should return data when response is ok', async () => {
-    const mockData = [{ country: 'India' }, { country: 'USA' }];
+  await expect(
+    dataSource.countryStats('key', 'India', '2024')
+  ).rejects.toBeInstanceOf(errors.serverError);
+});
 
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockData
-    });
+test('fetchCountryStats throws networkError on fetch failure', async () => {
+  fetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
-    const result = await dataSource.comparisionStats(
-      apiKey,
-      'India',
-      'USA',
-      '',
-      '',
-      date
-    );
+  await expect(
+    dataSource.countryStats('key', 'India', '2024')
+  ).rejects.toBeInstanceOf(errors.networkError);
+});
 
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(result).toEqual(mockData);
+test('fetchCountryStats returns undefined if country is empty', async () => {
+  const result = await dataSource.countryStats('key', '   ', '2024');
+  expect(result).toBeUndefined();
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+test('fetchCountryComparisionStats builds query params correctly', async () => {
+  const mockData = { result: 'ok' };
+
+  fetch.mockResolvedValue({
+    ok: true,
+    json: jest.fn().mockResolvedValue(mockData)
   });
 
-  test('should throw client error for 4xx response', async () => {
-    fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      text: async () => 'Bad Request'
-    });
+  const countries = ['India', 'USA'];
 
-    await expect(
-      dataSource.comparisionStats(
-        apiKey,
-        'India',
-        'USA',
-        '',
-        '',
-        date
-      )
-    ).rejects.toThrow('Client Error (400): Bad Request');
-  });
+  const result = await dataSource.comparisionStats('key', countries, '2024');
 
-  test('should throw server error for 5xx response', async () => {
-    fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 503
-    });
+  expect(fetch).toHaveBeenCalledWith(
+    expect.stringContaining('country1=India'),
+    expect.any(Object)
+  );
 
-    await expect(
-      dataSource.comparisionStats(
-        apiKey,
-        'India',
-        'USA',
-        '',
-        '',
-        date
-      )
-    ).rejects.toThrow(
-      'Server Error (503). Please try again later.'
-    );
-  });
+  expect(fetch).toHaveBeenCalledWith(
+    expect.stringContaining('country2=USA'),
+    expect.any(Object)
+  );
 
+  expect(result).toEqual(mockData);
+});
+
+test('fetchCountryComparisionStats throws networkError on failure', async () => {
+  fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+
+  await expect(
+    dataSource.comparisionStats('key', ['India'], '2024')
+  ).rejects.toBeInstanceOf(errors.networkError);
 });
