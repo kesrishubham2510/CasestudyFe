@@ -13,7 +13,13 @@ function Comparision() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (appContext.state.offlineMode === true) {
+
+         if(Object.keys(receivedData).length === 0){
+            console.log('No data is available to render on the page, moving to static page');
+         }
+
+         if ((appContext.state!=null && appContext.state.offlineMode!=null && appContext.state.offlineMode === true) 
+           || (Object.keys(receivedData).length === 0)) {
             navigate('/covid-info');
         }
     }, []);
@@ -27,8 +33,8 @@ function Comparision() {
         </h3> 
         <div className='comparisionGrid'>
 
-            {
-                receivedData.data.map(countryStat => {
+            { !(Object.keys(receivedData).length === 0) && 
+                receivedData?.data.map(countryStat => {
                     return <ComparisionCard key={countryStat.country} country={countryStat.country || "Abcd"} totalCases={countryStat.noOfCases || 0} recovered={countryStat.noOfRecoveries || 0} activeToday={countryStat.activeAsToday || 0} dosesAdministered={countryStat.dosesAdministeredInCountry || 0} />
 
                 })
