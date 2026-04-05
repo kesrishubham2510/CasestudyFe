@@ -19,11 +19,10 @@ function Stats() {
             console.log('No data is available to render on the page, moving to static page');
         }
 
-        if ((appContext.state!=null && appContext.state.offlineMode!=null && appContext.state.offlineMode === true) 
-           || (Object.keys(receivedData)?.length === 0)) {
+        if ((appContext?.state?.offlineMode) || (Object.keys(receivedData)?.length === 0)) {
             navigate('/covid-info');
         }
-    }, []);
+    }, [appContext?.state?.offlineMode, receivedData]);
 
     return <div className='stats'>
         {   !(Object.keys(receivedData).length === 0) &&

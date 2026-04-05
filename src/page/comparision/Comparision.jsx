@@ -8,21 +8,20 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function Comparision() {
 
     const location = useLocation();
-    const receivedData = location.state || {};
+    const receivedData = location.state || {data: []};
     const appContext = useContext(AppContext);
     const navigate = useNavigate();
 
     useEffect(() => {
 
-         if(Object.keys(receivedData).length === 0){
+        if((!receivedData?.data || receivedData.data.length === 0)){
             console.log('No data is available to render on the page, moving to static page');
-         }
+        }
 
-         if ((appContext.state!=null && appContext.state.offlineMode!=null && appContext.state.offlineMode === true) 
-           || (Object.keys(receivedData).length === 0)) {
+        if ((appContext?.state?.offlineMode) || (!receivedData?.data || receivedData.data.length === 0)) {
             navigate('/covid-info');
         }
-    }, []);
+    }, [appContext?.state?.offlineMode, receivedData]);
 
     return <section className="comparision-page">
         <h3>
@@ -34,7 +33,7 @@ function Comparision() {
         <div className='comparisionGrid'>
 
             { !(Object.keys(receivedData).length === 0) && 
-                receivedData?.data.map(countryStat => {
+                receivedData?.data?.map(countryStat => {
                     return <ComparisionCard key={countryStat.country} country={countryStat.country || "Abcd"} totalCases={countryStat.noOfCases || 0} recovered={countryStat.noOfRecoveries || 0} activeToday={countryStat.activeAsToday || 0} dosesAdministered={countryStat.dosesAdministeredInCountry || 0} />
 
                 })
