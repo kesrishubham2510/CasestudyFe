@@ -10,6 +10,15 @@ pipeline {
     }
 
     stages {
+
+        stage('Prepare') {
+            steps {
+                script {
+                    env.TIMESTAMP = new Date().format("yyyyMMddHHmmss")
+                }
+            }
+        }
+
         stage('Quality Gate') {
              agent {
                 docker {
@@ -28,10 +37,15 @@ pipeline {
         }
         
         stage('Build & Containerize') {
+            
             steps {
-                sh 'ls -al'
-                sh 'pwd'
-                sh 'docker build --build-arg REACT_APP_API_KEY=${REACT_APP_API_KEY} -t $DOCKER_IMAGE:0.0.1 .'
+                sh '''
+                docker build \
+                  --build-arg REACT_APP_API_KEY=${REACT_APP_API_KEY} \
+                  -t $DOCKER_IMAGE:$TIMESTAMP \
+                  -t $DOCKER_IMAGE:latest \
+                  .
+                '''
             }
         }
     }
