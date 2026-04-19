@@ -22,7 +22,7 @@ function Stats() {
         if ((appContext?.state?.offlineMode) || (Object.keys(receivedData)?.length === 0)) {
             navigate('/covid-info');
         }
-    }, [appContext?.state?.offlineMode, receivedData]);
+    }, [receivedData]);
 
     return <div className='stats'>
         {   !(Object.keys(receivedData).length === 0) &&

@@ -4,16 +4,12 @@ import { createContext, useState } from "react";
 
 const appStateInit = {
     'currCountry': 'India',
-    'country1': '',
-    'country2': '',
-    'country3': '',
-    'country4': '',
-    // The date of first covid-19 case report'
     'toggleButtonText':'Enable Offline Mode',
     'beginningDate': '2020-02-05',
     'dateFormat': 'dd-MM-yyyy',
     'dashboardTitle': 'Covistat',
-    'offlineMode': false
+    'offlineMode': false,
+    'supportedCountries': []
 }
 
 

@@ -12,218 +12,41 @@ function Welcome() {
 
 
     var appContext = useContext(AppContext);
+    const countries = appContext?.state?.supportedCountries;
     const navigate = useNavigate();
 
     useEffect(() => {
         if (appContext.state.offlineMode === true) {
             navigate('/covid-info');
+            return;
         }
-    }, []);
 
+        if (countries?.length) {
+            return;
+        }
 
-    const countries = [
-        "Afghanistan",
-        "Albania",
-        "Algeria",
-        "Andorra",
-        "Angola",
-        "Antarctica",
-        "Antigua and Barbuda",
-        "Argentina",
-        "Armenia",
-        "Australia",
-        "Austria",
-        "Azerbaijan",
-        "Bahamas",
-        "Bahrain",
-        "Bangladesh",
-        "Barbados",
-        "Belarus",
-        "Belgium",
-        "Belize",
-        "Benin",
-        "Bhutan",
-        "Bolivia",
-        "Bosnia",
-        "Botswana",
-        "Brazil",
-        "Brunei",
-        "Bulgaria",
-        "Burkina Faso",
-        "Burma",
-        "Burundi",
-        "Cabo Verde",
-        "Cambodia",
-        "Cameroon",
-        "Canada",
-        "Central African Republic",
-        "Chad",
-        "Chile",
-        "China",
-        "Colombia",
-        "Comoros",
-        "Congo",
-        "Costa Rica",
-        "Côte d'Ivoire",
-        "Croatia",
-        "Cuba",
-        "Cyprus",
-        "Czechia",
-        "Denmark",
-        "Diamond Princess",
-        "Djibouti",
-        "Dominica",
-        "Dominican Republic",
-        "DRC",
-        "Ecuador",
-        "Egypt",
-        "El Salvador",
-        "Equatorial Guinea",
-        "Eritrea",
-        "Estonia",
-        "Ethiopia",
-        "Fiji",
-        "Finland",
-        "France",
-        "Gabon",
-        "Gambia",
-        "Georgia",
-        "Germany",
-        "Ghana",
-        "Greece",
-        "Grenada",
-        "Guatemala",
-        "Guinea-Bissau",
-        "Guinea",
-        "Guyana",
-        "Haiti",
-        "Holy See",
-        "Honduras",
-        "Hungary",
-        "Iceland",
-        "India",
-        "Indonesia",
-        "Iran",
-        "Iraq",
-        "Ireland",
-        "Israel",
-        "Italy",
-        "Jamaica",
-        "Japan",
-        "Jordan",
-        "Kazakhstan",
-        "Kenya",
-        "Kiribati",
-        "Kosovo",
-        "Kuwait",
-        "Kyrgyzstan",
-        "Lao People's Democratic Republic",
-        "Latvia",
-        "Lebanon",
-        "Lesotho",
-        "Liberia",
-        "Libyan Arab Jamahiriya",
-        "Liechtenstein",
-        "Lithuania",
-        "Luxembourg",
-        "Macedonia",
-        "Madagascar",
-        "Malawi",
-        "Malaysia",
-        "Maldives",
-        "Mali",
-        "Malta",
-        "Marshall Islands",
-        "Mauritania",
-        "Mauritius",
-        "Mexico",
-        "Micronesia",
-        "Moldova",
-        "Monaco",
-        "Mongolia",
-        "Montenegro",
-        "Morocco",
-        "Mozambique",
-        "MS Zaandam",
-        "N. Korea",
-        "Namibia",
-        "Nauru",
-        "Nepal",
-        "Netherlands",
-        "New Zealand",
-        "Nicaragua",
-        "Niger",
-        "Nigeria",
-        "Norway",
-        "Oman",
-        "Pakistan",
-        "Palau",
-        "Panama",
-        "Papua New Guinea",
-        "Paraguay",
-        "Peru",
-        "Philippines",
-        "Poland",
-        "Portugal",
-        "Qatar",
-        "Romania",
-        "Russia",
-        "Rwanda",
-        "S. Korea",
-        "Saint Kitts and Nevis",
-        "Saint Lucia",
-        "Saint Vincent and the Grenadines",
-        "Samoa",
-        "San Marino",
-        "Sao Tome and Principe",
-        "Saudi Arabia",
-        "Senegal",
-        "Serbia",
-        "Seychelles",
-        "Sierra Leone",
-        "Singapore",
-        "Slovakia",
-        "Slovenia",
-        "Solomon Islands",
-        "Somalia",
-        "South Africa",
-        "South Sudan",
-        "Spain",
-        "Sri Lanka",
-        "Sudan",
-        "Summer Olympics 2020",
-        "Suriname",
-        "Swaziland",
-        "Sweden",
-        "Switzerland",
-        "Syrian Arab Republic",
-        "Taiwan",
-        "Tajikistan",
-        "Tanzania",
-        "Thailand",
-        "Timor-Leste",
-        "Togo",
-        "Tonga",
-        "Trinidad and Tobago",
-        "Tunisia",
-        "Turkey",
-        "Tuvalu",
-        "UAE",
-        "Uganda",
-        "UK",
-        "Ukraine",
-        "Uruguay",
-        "USA",
-        "Uzbekistan",
-        "Vanuatu",
-        "Venezuela",
-        "Vietnam",
-        "West Bank and Gaza",
-        "Winter Olympics 2022",
-        "Yemen",
-        "Zambia",
-        "Zimbabwe"
-    ]
+        const fetchSupportedCountries = async () => {
+
+            try {
+                const availableCountries = await dataSource.supportedCountries(
+                    process.env.REACT_APP_API_KEY
+                );
+
+                appContext.setState((prevState) => ({
+                    ...prevState,
+                    'supportedCountries': availableCountries
+                }));
+
+            } catch (error) {
+                console.error('Error fetching supported countries:', error);
+            }
+        };
+
+        console.log("Getting supported countries from API:- ");
+        fetchSupportedCountries();
+
+    }, [countries]);
+
 
     var countryFieldStateInitial = {
         'countryName': '',
@@ -275,7 +98,7 @@ function Welcome() {
             return;
         }
 
-        const comparisionCountries = countryFieldState.countryName.split(',').map(country => country?.trim()).filter(country => country?.length!=0);
+        const comparisionCountries = countryFieldState.countryName.split(',').map(country => country?.trim()).filter(country => country?.length != 0);
         console.log('Comparision countries:- ', comparisionCountries);
         var invalidCountry = false;
 
@@ -308,16 +131,16 @@ function Welcome() {
             } else {
                 receivedData = await dataSource.comparisionStats(process.env.REACT_APP_API_KEY, comparisionCountries, formattedDate);
                 let data = {
-                'referencedDate': formattedDate,
-                'data': receivedData
-              }
+                    'referencedDate': formattedDate,
+                    'data': receivedData
+                }
                 navigate('/comparision', { state: data });
             }
         } catch (error) {
 
-            if(error instanceof errors.networkError){
+            if (error instanceof errors.networkError) {
                 console.log('Will display static page about Covid-19');
-                navigate('/covid-info', {state: {loadedDueToError: true}});
+                navigate('/covid-info', { state: { loadedDueToError: true } });
             }
 
             setcountryFieldState((prevState) => {
@@ -333,6 +156,7 @@ function Welcome() {
         const [year, month, day] = dateString.split("-");
         return `${day}-${month}-${year}`;
     }
+    
     return <section className="search-bar">
         <h2>{appContext.state.dashboardTitle}</h2>
         <div className='input'>
