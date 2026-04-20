@@ -99,7 +99,7 @@ describe("Welcome Component", () => {
   test("calls countryStats and navigates to /stats for single country", async () => {
   dataSource.countryStats.mockResolvedValue({ some: "data" });
 
-  renderComponent(false, ["India"]); // ✅ ensure valid country
+  renderComponent(false, ["India"]);
 
   fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
     target: { id: "countryName", value: "India" },
@@ -187,5 +187,140 @@ describe("Welcome Component", () => {
         state: { loadedDueToError: true },
       });
     });
+  });
+});
+
+
+test("fetches supported countries when not present in context", async () => {
+  const setState = jest.fn();
+
+  render(
+    <AppContext.Provider
+      value={{
+        state: {
+          offlineMode: false,
+          dashboardTitle: "COVID Dashboard",
+          beginningDate: "2020-02-05",
+          supportedCountries: [],
+        },
+        setState,
+      }}
+    >
+      <MemoryRouter>
+        <Welcome />
+      </MemoryRouter>
+    </AppContext.Provider>
+  );
+
+  await waitFor(() => {
+    expect(dataSource.supportedCountries).toHaveBeenCalled();
+    expect(setState).toHaveBeenCalled();
+  });
+});
+
+test("does not fetch supported countries if already present", async () => {
+  renderComponent(false, ["India"]);
+
+  await waitFor(() => {
+    expect(dataSource.supportedCountries).not.toHaveBeenCalled();
+  });
+}); 
+
+test("does not call API when input is empty", async () => {
+  renderComponent();
+
+  fireEvent.click(screen.getByText("Search"));
+
+  await waitFor(() => {
+    expect(dataSource.countryStats).not.toHaveBeenCalled();
+    expect(dataSource.comparisionStats).not.toHaveBeenCalled();
+  });
+});
+
+test("hides info toast after closing", async () => {
+  renderComponent();
+
+  const infoToast = screen.getByText(/Use Comma separated/i);
+  expect(infoToast).toBeInTheDocument();
+
+  fireEvent.click(screen.getAllByText("close")[0]);
+
+  await waitFor(() => {
+    expect(screen.queryByText(/Use Comma separated/i)).not.toBeInTheDocument();
+  });
+});
+
+test("formats date correctly before API call", async () => {
+  dataSource.countryStats.mockResolvedValue({});
+
+  renderComponent(false, ["India"]);
+
+  fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
+    target: { id: "countryName", value: "India" },
+  });
+
+  fireEvent.change(screen.getByDisplayValue("2020-02-05"), {
+    target: { id: "referenceDate", value: "2020-12-31" },
+  });
+
+  fireEvent.click(screen.getByText("Search"));
+
+  await waitFor(() => {
+    expect(dataSource.countryStats).toHaveBeenCalledWith(
+      expect.anything(),
+      "India",
+      "31-12-2020" 
+    );
+  });
+});
+
+test("shows error message for generic API error", async () => {
+  dataSource.countryStats.mockRejectedValue(new Error("Some error"));
+
+  renderComponent(false, ["India"]);
+
+  fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
+    target: { id: "countryName", value: "India" },
+  });
+
+  fireEvent.click(screen.getByText("Search"));
+
+  await waitFor(() => {
+    expect(screen.getByText("Some error")).toBeInTheDocument();
+  });
+});
+
+test("stops on first invalid country in multiple input", async () => {
+  renderComponent(false, ["India"]);
+
+  fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
+    target: { id: "countryName", value: "India, InvalidCountry" },
+  });
+
+  fireEvent.click(screen.getByText("Search"));
+
+  await waitFor(() => {
+    expect(screen.getByText(/Invalid/)).toBeInTheDocument();
+    expect(dataSource.comparisionStats).not.toHaveBeenCalled();
+  });
+});
+
+test("trims spaces in country names", async () => {
+  dataSource.countryStats.mockResolvedValue({});
+
+  renderComponent(false, ["India"]);
+
+  fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
+    target: { id: "countryName", value: "   India   " },
+  });
+
+  fireEvent.click(screen.getByText("Search"));
+
+  await waitFor(() => {
+    expect(dataSource.countryStats).toHaveBeenCalledWith(
+      expect.anything(),
+      "   India   ",
+      expect.anything()
+    );
   });
 });

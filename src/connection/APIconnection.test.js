@@ -6,7 +6,8 @@ global.fetch = jest.fn();
 
 jest.mock('./Endpoint', () => ({
   latestStat: 'https://api.com/{country}/{referencedDate}',
-  getComparision: 'https://api.com/compare'
+  getComparision: 'https://api.com/compare',
+  supportedCountries: 'https://api.com/supported-countries' // ✅ add this
 }));
 
 jest.mock('../error/Errors', () => ({
@@ -107,4 +108,81 @@ test('fetchCountryComparisionStats throws networkError on failure', async () => 
   await expect(
     dataSource.comparisionStats('key', ['India'], '2024')
   ).rejects.toBeInstanceOf(errors.networkError);
+});
+
+test('fetchSupportedCountries returns data on success', async () => {
+  const mockData = ['India', 'USA'];
+
+  fetch.mockResolvedValue({
+    ok: true,
+    json: jest.fn().mockResolvedValue(mockData)
+  });
+
+  const result = await dataSource.supportedCountries('test-key');
+
+  expect(result).toEqual(mockData);
+  expect(fetch).toHaveBeenCalledWith(
+    Endpoint.supportedCountries,
+    expect.objectContaining({
+      method: 'GET',
+      headers: {
+        'API-KEY': 'test-key'
+      }
+    })
+  );
+});
+
+test('fetchSupportedCountries throws clientError on 4xx', async () => {
+  fetch.mockResolvedValue({
+    ok: false,
+    status: 404,
+    text: jest.fn().mockResolvedValue('Not Found')
+  });
+
+  await expect(
+    dataSource.supportedCountries('test-key')
+  ).rejects.toBeInstanceOf(errors.clientError);
+});
+
+test('fetchSupportedCountries throws serverError on 5xx', async () => {
+  fetch.mockResolvedValue({
+    ok: false,
+    status: 500
+  });
+
+  await expect(
+    dataSource.supportedCountries('test-key')
+  ).rejects.toBeInstanceOf(errors.serverError);
+});
+
+test('fetchSupportedCountries throws networkError on fetch failure', async () => {
+  fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+
+  await expect(
+    dataSource.supportedCountries('test-key')
+  ).rejects.toBeInstanceOf(errors.networkError);
+});
+
+test('fetchSupportedCountries rethrows non-TypeError errors', async () => {
+  fetch.mockRejectedValue(new Error('Some unexpected error'));
+
+  await expect(
+    dataSource.supportedCountries('test-key')
+  ).rejects.toThrow('Some unexpected error');
+});
+
+test('fetchSupportedCountries reads error text on client error', async () => {
+  const mockText = jest.fn().mockResolvedValue('Bad Request');
+
+  fetch.mockResolvedValue({
+    ok: false,
+    status: 400,
+    text: mockText
+  });
+
+  try {
+    await dataSource.supportedCountries('test-key');
+  } catch (e) {}
+
+  expect(mockText).toHaveBeenCalled();
 });
