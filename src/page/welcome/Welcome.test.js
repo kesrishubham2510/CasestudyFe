@@ -13,10 +13,11 @@ jest.mock("react-router-dom", () => ({
 }));
 
 // Mock API
-jest.mock("../../connection/APIConnection", () => ({
+ jest.mock("../../connection/APIConnection", () => ({
   dataSource: {
     countryStats: jest.fn(),
     comparisionStats: jest.fn(),
+    supportedCountries: jest.fn().mockResolvedValue(["India", "USA", "UK", "France"]),
   },
 }));
 
@@ -28,7 +29,9 @@ jest.mock("../../molecule/toast/Toast", () => (props) => (
   </div>
 ));
 
-const renderComponent = (offlineMode = false) => {
+const renderComponent = (offlineMode = false, countries = ["India", "USA", "UK", "France"]) => {
+  const setState = jest.fn();
+
   return render(
     <AppContext.Provider
       value={{
@@ -36,7 +39,9 @@ const renderComponent = (offlineMode = false) => {
           offlineMode,
           dashboardTitle: "COVID Dashboard",
           beginningDate: "2020-02-05",
+          supportedCountries: countries,
         },
+        setState, // ✅ important
       }}
     >
       <MemoryRouter>
@@ -92,23 +97,23 @@ describe("Welcome Component", () => {
   });
 
   test("calls countryStats and navigates to /stats for single country", async () => {
-    dataSource.countryStats.mockResolvedValue({ some: "data" });
+  dataSource.countryStats.mockResolvedValue({ some: "data" });
 
-    renderComponent();
+  renderComponent(false, ["India"]); // ✅ ensure valid country
 
-    fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
-      target: { id: "countryName", value: "India" },
-    });
+  fireEvent.change(screen.getByPlaceholderText(/Provide comma separared/i), {
+    target: { id: "countryName", value: "India" },
+  });
 
-    fireEvent.click(screen.getByText("Search"));
+  fireEvent.click(screen.getByText("Search"));
 
-    await waitFor(() => {
-      expect(dataSource.countryStats).toHaveBeenCalled();
-      expect(mockNavigate).toHaveBeenCalledWith("/stats", {
-        state: { some: "data" },
-      });
+  await waitFor(() => {
+    expect(dataSource.countryStats).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith("/stats", {
+      state: { some: "data" },
     });
   });
+});
 
   test("calls comparisionStats and navigates for 2 countries", async () => {
     dataSource.comparisionStats.mockResolvedValue({ compare: "data" });
